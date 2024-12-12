@@ -2,6 +2,8 @@ import logo from './logo.svg';
 import './App.css';
 import React, {  useState } from "react";
 
+import {  useEffect } from "react";
+
 
 import axios from "axios";
 
@@ -12,6 +14,21 @@ function App() {
     author: "",
     file: null,
   });
+
+  const [postList, setPostList] = useState([]); // 게시물 리스트 상태
+
+  // 게시물 리스트를 가져오는 함수
+  useEffect(() => {
+    axios
+      .get("/post/list")
+      .then((response) => {
+        setPostList(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching posts:", error);
+      });
+  }, []);
+
 
   function postChange(e) {
     const { name, value } = e.target;
@@ -39,6 +56,17 @@ function App() {
       .then(() => {
         alert("Post created successfully");
         setFormData({ title: "", content: "", author: "", file: null });
+
+        // 게시물 리스트 갱신
+        axios
+          .get("/post/list")
+          .then((response) => {
+            setPostList(response.data);
+          })
+          .catch((error) => {
+            console.error("Error fetching posts:", error);
+          });
+
         
       })
       .catch((error) => {
@@ -72,6 +100,27 @@ function App() {
     </div>
     <button>게시물 작성</button>
   </form>
+  {/* 게시물 리스트 출력 */}
+  <h2>게시물 리스트</h2>
+      <ul>
+        {postList.map((post) => (
+          <li key={post.post_id}>
+            <h3>{post.title}</h3>
+            <p>{post.content}</p>
+            <p><strong>작성자:</strong> {post.author}</p>
+            <p><strong>작성일:</strong> {new Date(new Date(post.created_at).getTime() + 9 * 60 * 60 * 1000).toLocaleString()}</p>
+            {post.attachment_url && (
+              <p>
+                <strong>첨부 파일:</strong>{" "}
+                <a href={post.attachment_url} target="_blank" rel="noopener noreferrer">
+                  다운로드
+                </a>
+              </p>
+            )}
+          </li>
+        ))}
+      </ul>
+
   </div>
   );
 }
