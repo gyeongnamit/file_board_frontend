@@ -100,6 +100,7 @@ function App() {
     </div>
     <button>게시물 작성</button>
   </form>
+  
   {/* 게시물 리스트 출력 */}
   <h2>게시물 리스트</h2>
       <ul>
